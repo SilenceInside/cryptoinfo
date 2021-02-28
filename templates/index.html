@@ -1,0 +1,91 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+  <link href="{% static 'style.css' %}" rel="stylesheet">
+  <script src="https://unpkg.com/vue@next"></script>
+
+  <title>Document</title>
+</head>
+<body>
+<div id="app">
+{% verbatim %}
+  <div class="container">
+    <div class="row">
+      <div class="col-8 mx-auto mt-5">
+        <h3 class="mb-5"> Crypto Info</h3>
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th scope="col">Rank</th>
+            <th scope="col">Crypto currency</th>
+            <th scope="col">Price</th>
+          </tr>
+          </thead>
+          <tbody>
+
+            <tr v-for="coin in coins" :key="coin.id">
+              <th scope="row" class="align-middle">{{ coin.rank }}</th>
+              <td class="align-middle">
+                <img :src="coin.image" alt="" class="px-2" width="40">
+                {{ coin.name }}
+                <small class="text-muted px-2">{{ coin.symbol }}</small>
+              </td>
+              <td class="align-middle"
+                  :class="{'incr': coin.state == 'incr', 'decr': coin.state== 'decr'}">
+                {{ coin.price }}$</td>
+            </tr>
+
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endverbatim %}
+</div>
+
+
+<script>
+  const { createApp } = Vue;
+
+  const CoinsApp = {
+      data(){
+          return {
+              coin: 'Just coin',
+              coins: [
+                  {name: 'Bitcoin', url: null, symbol: 'btc', price: 123},
+              ]
+          }
+      },
+      created: function () {
+
+          fetch(`http://${window.location.host}/coins-list/`, {
+              method: 'GET',
+              xsrfCookieName: 'csrftoken',
+              xsrfHeaderName: 'X-CSRFToken',
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+              }
+          })
+            .then(response => response.json())
+            .then(response => {
+                this.coins = response.coins;
+            });
+
+          const socket = new WebSocket(`ws://${window.location.host}/ws/coins/`);
+
+          socket.onmessage = (event) => {
+             this.coins = JSON.parse(event.data);};
+      }
+  }
+
+  let a = createApp(CoinsApp).mount('#app');
+</script>
+</body>
+</html>

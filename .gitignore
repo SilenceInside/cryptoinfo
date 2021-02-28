@@ -1,0 +1,12 @@
+.idea
+.pyc
+__pycache__/
+*/__pycache__/
+
+*.py[cod]
+db.sqlite3
+
+celerybeat-schedule
+celerybeat.pid
+/dump.rdb
+/temp-20361.rdb
