@@ -10,3 +10,4 @@ celerybeat-schedule
 celerybeat.pid
 /dump.rdb
 /temp-20361.rdb
+/crypto/settings_local.py
